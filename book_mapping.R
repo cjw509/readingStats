@@ -11,7 +11,7 @@ world <- ne_countries(scale = "medium", returnclass = "sf")
 #class(world)
 
 #read goodreads Library data in
-book.dat <- read.csv("//userfs/cjw509/w2k/Downloads/book_data.csv", stringsAsFactors = FALSE)
+book.dat <- read.csv("data/book_data.csv", stringsAsFactors = FALSE)
 
 #standardise some country names
 book.dat$Nationality <- gsub("USA", "United States of America", book.dat$Nationality)
