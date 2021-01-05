@@ -52,13 +52,14 @@ world.dat.new@data <- world.dat.new@data %>%
 # add binary owned/not owned and read/not read values for each country and set as factors
 world.dat.new@data <- world.dat.new@data %>%                        
                         mutate(own.bin = factor(ifelse(own.count > 0, 1, 0), levels = c(0, 1), labels = c("No", "Yes"))) %>% 
-                        mutate(read.bin = factor(ifelse(read.count > 0, 1, 0), levels = c(0, 1), labels = c("No", "Yes")))
+                        mutate(read.bin = factor(ifelse(read.count > 0, 1, 0), levels = c(0, 1), labels = c("No", "Yes"))) %>% 
+                        mutate(all.bin = factor(ifelse(read.count > 0 , 3, ifelse(own.count > 0, 2, 1)), 
+                                                levels = c(1, 2, 3), labels = c("Not owned", "Owned", "Read")))
 
 #remove antartica from the map to make plots look better
 world.dat.new <- world.dat.new[!world.dat.new$ADMIN== "Antarctica", ]
 
 rm(calibre.dat, nat.join, nat.own, nat.read, world.dat)
-
 
 pal <- colorFactor(palette = c("#8d96a3","#00798c"),
                    domain = world.dat.new@data$own.bin)
@@ -71,11 +72,6 @@ labels.owned <- sprintf(
 labels.read <- sprintf(
   "<strong>%s</strong><br/>Books Read - %g ",
   world.dat.new@data$ADMIN, world.dat.new@data$read.count
-) %>% lapply(htmltools::HTML)
-
-labels.all <- sprintf(
-  "<strong>%s</strong><br/>Books Owned - %g <br />Books Read - %g",
-  world.dat.new@data$ADMIN, world.dat.new@data$own.count, world.dat.new@data$read.count
 ) %>% lapply(htmltools::HTML)
 
 
@@ -108,7 +104,34 @@ leaflet(data = world.dat.new) %>%
                 style = list("font-weight" = "normal", padding = "3px 8px"),
                 textsize = "15px",
                 direction = "auto")) %>%
-  addLegend(pal = pal, values = ~own.bin, opacity = 0.7, title = "Book Read",
+  addLegend(pal = pal, values = ~read.bin, opacity = 0.7, title = "Book Read",
+            position = "bottomright")
+
+
+##all
+
+pal.all <- colorFactor(palette = c("#8d96a3", "#fdbb84", "#e34a33"),
+                        domain = world.dat.new@data$all.bin)
+                   
+labels.all <- sprintf(
+  "<strong>%s</strong><br/>Books Owned - %g <br />Books Read - %g",
+  world.dat.new@data$ADMIN, world.dat.new@data$own.count, world.dat.new@data$read.count
+) %>% lapply(htmltools::HTML)
+
+
+leaflet(data = world.dat.new) %>%
+  addPolygons(fillColor = ~pal.all(all.bin),
+              weight = 0.5,
+              opacity = 1,
+              color = "black",
+              fillOpacity = 0.7,
+              highlightOptions = highlightOptions(color = "white", weight = 2, bringToFront = TRUE),
+              label = labels.all,
+              labelOptions = labelOptions(
+                style = list("font-weight" = "normal", padding = "3px 8px"),
+                textsize = "15px",
+                direction = "auto")) %>%
+  addLegend(pal = pal.all, values = ~all.bin, opacity = 0.7, title = "Read Status",
             position = "bottomright")
 
 
