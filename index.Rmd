@@ -1,9 +1,43 @@
 ---
-title: "My Website"
+title: "BookStats"
+output: html_document
 ---
 
-Hello, Website!
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
 
-For more information about simple R Markdown websites, please read the documentation at https://bookdown.org/yihui/rmarkdown/rmarkdown-site.html.
+source("processData.R")
 
-Please also note that simple R Markdown sites are _not_ based on **blogdown**. They are probably good for websites with only a few Rmd documents. For larger-scale and more sophisticated websites (such as blogs), you may want to use **blogdown** instead: https://github.com/rstudio/blogdown.
+```
+
+# Reading the World
+
+
+```{r echo= FALSE}
+
+pal.all <- colorFactor(palette = c("#8d96a3", "#fdbb84", "#e34a33"),
+                        domain = world.dat.new@data$all.bin)
+                   
+labels.all <- sprintf(
+  "<strong>%s</strong><br/>Books Owned - %g <br />Books Read - %g",
+  world.dat.new@data$ADMIN, world.dat.new@data$own.count, world.dat.new@data$read.count
+) %>% lapply(htmltools::HTML)
+
+leaflet(data = world.dat.new) %>%
+  addPolygons(fillColor = ~pal.all(all.bin),
+              weight = 0.5,
+              opacity = 1,
+              color = "black",
+              fillOpacity = 0.7,
+              highlightOptions = highlightOptions(color = "white", weight = 2, bringToFront = TRUE),
+              label = labels.all,
+              labelOptions = labelOptions(
+                style = list("font-weight" = "normal", padding = "3px 8px"),
+                textsize = "15px",
+                direction = "auto")) %>%
+  addLegend(pal = pal.all, values = ~all.bin, opacity = 0.7, title = "Read Status",
+            position = "bottomright")
+
+
+
+``` 
