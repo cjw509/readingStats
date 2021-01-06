@@ -1,14 +1,22 @@
-library(dplyr)
-library(tidyr)
+library(tidyverse)
+library(lubridate)
+library(googlesheets4)
 library(sp)
 library(geojsonio)
-library(leaflet)
 
 #read world map in
 world.dat <- geojson_read("https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson",  what = "sp")
 
 #read goodreads Library data in
-calibre.dat <- read.csv("data/calibre_books.csv", stringsAsFactors = FALSE)
+#calibre.dat <- read.csv("data/calibre_books.csv", stringsAsFactors = FALSE)
+calibre.dat <- read_sheet('1aq35ICEY5cQSLPcPIs-NNAypsLKIk9GLCf_Hw55FYNI')
+
+#remove columns not useful to stats
+drop.cols <- c('cover', 'comments', 'identifiers', 'library_name', 'X.review', 
+               'size', 'uuid', 'isbn')
+
+calibre.dat <- calibre.dat %>% 
+                select(-one_of(drop.cols))
 
 #split nationality column to deal with dual nationalities
 calibre.dat <- calibre.dat %>%
@@ -26,13 +34,22 @@ calibre.dat = calibre.dat %>%
          secondary.nat = gsub("Republic of the Congo", "Republic of Congo", secondary.nat)
   )
 
+calibre.dat <- calibre.dat %>% 
+                mutate(title = as.character(unlist(title)),
+                       title_sort = as.character(unlist(title_sort)))
+
+#convert date columns to correct date format instead of character type
+calibre.dat <- calibre.dat %>% 
+                mutate(X.dateread =  ymd_hms(X.dateread),
+                       pubdate =  ymd_hms(pubdate))
+
 #create dataframes of countries with counts of owned and read books
 nat.own <- calibre.dat %>% 
   count(primary.nat) %>% 
   rename(admin = "primary.nat", own.count = "n")
 
 nat.read <- calibre.dat %>% 
-  filter(X.read == "True") %>% 
+  filter(X.read == "TRUE") %>% 
   count(primary.nat) %>% 
   rename(admin = "primary.nat", read.count = "n") 
 
@@ -59,4 +76,13 @@ world.dat.new@data <- world.dat.new@data %>%
 #remove antartica from the map to make plots look better
 world.dat.new <- world.dat.new[!world.dat.new$ADMIN== "Antarctica", ]
 
-rm(calibre.dat, nat.join, nat.own, nat.read, world.dat)
+world.dat.df <- world.dat.new@data
+
+# Create data
+country.summary <- world.dat.df %>% 
+                    select(ADMIN, own.count, read.count) %>% 
+                    filter(own.count > 0) %>% 
+                    arrange(desc(own.count))
+
+
+rm(drop.cols, nat.join, nat.own, nat.read, world.dat)
