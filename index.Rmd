@@ -1,5 +1,5 @@
 ---
-title: "BookStats"
+title: "My Reading History"
 knit: (function(input_file, encoding) {
   out_dir <- 'docs';
   rmarkdown::render(input_file,
@@ -8,17 +8,49 @@ knit: (function(input_file, encoding) {
 output: html_document
 ---
 
+<style>
+.leaflet {
+   margin: auto;
+   margin-top: 30px;
+   margin-bottom: 30px;
+}
+
+.figure {
+   margin-top: 100px;
+   margin-bottom: 100px;
+}
+
+table {
+    margin-top: 100px;
+    margin-bottom: 100px !important;
+}
+
+.container { width: 800px; }
+
+</style>
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(leaflet)
+library(ggplot2)
+library(treemap)
 
 source("processData.R")
 
 ```
 
-# Reading the World
+
+## Reading the World
+
+<div style="margin-bottom:30px;">
+
+In the build up to the 2018 World Cup.  
+
+Even finding and obtaining a book (translated to English) to read for some countries proved to be a tricky task.  
 
 
-```{r echo= FALSE}
+```{r echo= FALSE, fig.align = "center", width = 800}
 
 pal.all <- colorFactor(palette = c("#8d96a3", "#fdbb84", "#e34a33"),
                         domain = world.dat.new@data$all.bin)
@@ -28,7 +60,8 @@ labels.all <- sprintf(
   world.dat.new@data$ADMIN, world.dat.new@data$own.count, world.dat.new@data$read.count
 ) %>% lapply(htmltools::HTML)
 
-leaflet(data = world.dat.new) %>%
+world.dat.new %>% 
+  leaflet(width = "100%") %>% 
   addPolygons(fillColor = ~pal.all(all.bin),
               weight = 0.5,
               opacity = 1,
@@ -46,3 +79,40 @@ leaflet(data = world.dat.new) %>%
 
 
 ``` 
+
+</div>
+
+<div style="margin-bottom:30px;">
+
+Since making a concious effort in 2018 to try to read more widely I have definitely managed to broaden my reading horizons, but my reading history is still dominated by authors from primarily English speaking countries. 
+
+</div>
+
+
+```{r echo= FALSE, fig.align = "center", fig.margin = TRUE, width = 800, warning=FALSE}
+treemap(country.summary,
+        # data
+        index="ADMIN",
+        vSize="read.count",
+        type="index",
+        
+        # Main
+        title="",
+        palette="Dark2",
+        
+        # Borders:
+        border.col=c("black"),             
+        border.lwds=1,                         
+        
+        # Labels
+        fontsize.labels=0.5,
+        fontcolor.labels="white",
+        fontface.labels=1,            
+        bg.labels=c("transparent"),              
+        align.labels=c("center", "center"),                                  
+        overlap.labels=0.5,
+        inflate.labels=T                        # If true, labels are bigger when rectangle is bigger.
+        )
+
+``` 
+
