@@ -50,7 +50,7 @@ In the build up to the 2018 World Cup.
 Even finding and obtaining a book (translated to English) to read for some countries proved to be a tricky task.  
 
 
-```{r echo= FALSE, fig.align = "center", width = 800}
+```{r echo= FALSE}
 
 pal.all <- colorFactor(palette = c("#8d96a3", "#fdbb84", "#e34a33"),
                         domain = world.dat.new@data$all.bin)
