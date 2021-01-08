@@ -9,6 +9,7 @@ world.dat <- geojson_read("https://raw.githubusercontent.com/datasets/geo-countr
 
 #read goodreads Library data in
 #calibre.dat <- read.csv("data/calibre_books.csv", stringsAsFactors = FALSE)
+gs4_auth(email = TRUE)
 calibre.dat <- read_sheet('1aq35ICEY5cQSLPcPIs-NNAypsLKIk9GLCf_Hw55FYNI')
 
 #remove columns not useful to stats
