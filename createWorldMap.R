@@ -81,18 +81,20 @@ leaflet(data = world.dat.new) %>%
             position = "bottomright")
 
 # Horizontal version
-ggplot(country.summary, aes(x= ADMIN, y=read.count)) +
-  geom_segment(aes(x=reorder(ADMIN, read.count), xend=ADMIN, y=0, yend=read.count), color="grey") +
-  geom_point(size=3, color="#69b3a2") +
-  theme_light() +
-  coord_flip() +
-  xlab("Number of books read") + 
-  ylab("Country") +
-  theme(
-    panel.grid.major.y = element_blank(),
-    panel.border = element_blank(),
-    axis.ticks.y = element_blank()
-  )
+country.summary %>% 
+  filter(read.count > 0) %>% 
+  ggplot(aes(x= ADMIN, y=read.count)) +
+    geom_segment(aes(x=reorder(ADMIN, read.count), xend=ADMIN, y=0, yend=read.count), color="grey") +
+    geom_point(size=3, color="#69b3a2") +
+    theme_light() +
+    coord_flip() +
+    xlab("Country") + 
+    ylab("Number of books read") +
+    theme(
+      panel.grid.major.y = element_blank(),
+      panel.border = element_blank(),
+      axis.ticks.y = element_blank()
+    )
 
 # Plot
 treemap(country.summary,
