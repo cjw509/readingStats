@@ -76,16 +76,21 @@ world.dat.new %>%
   addLegend(pal = pal.all, values = ~all.bin, opacity = 0.7, title = "Read Status",
             position = "bottomright")
 
-
-
 ``` 
 
 </div>
 
 <div style="margin-bottom:30px;">
 
-Since making a concious effort in 2018 to try to read more widely I have definitely managed to broaden my reading horizons, but my reading history is still dominated by authors from primarily English speaking countries. 
+```{r echo = FALSE, results='asis'}
+uk.prop <- as.character(round(country.summary$prop.read[country.summary$ADMIN == "United Kingdom"],2)*100)
+usa.prop <- as.character(round(country.summary$prop.read[country.summary$ADMIN == "United States of America"],2)*100)
 
+uk.usa.prop <- as.character(round(country.summary$prop.read[country.summary$ADMIN == "United Kingdom"],2)*100 +
+                         round(country.summary$prop.read[country.summary$ADMIN == "United States of America"],2)*100)
+
+cat(paste0("Since making a concious effort in 2018 to try to read more widely I have definitely managed to broaden my reading horizons, but my reading history is still dominated by authors from primarily English speaking countries, with ", uk.usa.prop, "% of read books by authors from either the UK or USA. Just under half of the books I've read were written by authors from the UK (", uk.prop, "%), closely followed by authors from the USA (", usa.prop,"%)."), sep = '')
+```
 </div>
 
 
